@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,9 +24,8 @@ public class ProfileController {
         return response;
     }
 
-    @GetMapping("/test")
-    @ResponseBody
-    public String test(Authentication auth){
-        return "Auth is working fine";
+    @GetMapping("/profile")
+    public ProfileResponse getProfile(@CurrentSecurityContext(expression = "authentication?.name") String email){
+        return profileService.getProfile(email);
     }
 }

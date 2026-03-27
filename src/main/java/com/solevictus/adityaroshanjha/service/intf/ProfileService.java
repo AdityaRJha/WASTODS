@@ -7,4 +7,5 @@ import jakarta.validation.Valid;
 
 public interface ProfileService {
    ProfileResponse createProfile(@Valid ProfileRequest request);
+   ProfileResponse getProfile(String email);
 }
