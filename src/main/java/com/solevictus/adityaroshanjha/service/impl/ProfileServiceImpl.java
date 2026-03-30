@@ -7,7 +7,6 @@ import com.solevictus.adityaroshanjha.repository.UserRepository;
 import com.solevictus.adityaroshanjha.service.intf.ProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,13 +14,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
-public class ProfilesServiceImpl implements ProfileService {
+public class ProfileServiceImpl implements ProfileService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     public ProfileResponse createProfile(@Valid ProfileRequest request) {
@@ -40,6 +41,27 @@ public class ProfilesServiceImpl implements ProfileService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email : "+email));
 
         return convertToProfileResponse(existingUser);
+    }
+
+    @Override
+    public void sendResetOtp(String email) {
+        UserEntity existingEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email : "+email));
+
+        // Generate 6-digit OTP and set it to the user entity, then save it
+        String otp = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
+
+        //expiration time for otp is 5 minutes
+        existingEntity.setResetOtp(otp);
+        existingEntity.setResetOtpExpireAt(System.currentTimeMillis() + 5 * 60 * 1000); // OTP valid for 5 minutes
+        userRepository.save(existingEntity);
+
+        // Here you would also send the OTP to the user's email using your EmailService
+        try{
+            emailService.sendResetOtpEmail(existingEntity.getEmail(), otp);
+        }catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send OTP email");
+        }
     }
 
     private ProfileResponse convertToProfileResponse(UserEntity newProfile) {
