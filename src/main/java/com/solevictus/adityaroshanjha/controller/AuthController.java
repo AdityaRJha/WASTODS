@@ -2,10 +2,12 @@ package com.solevictus.adityaroshanjha.controller;
 
 
 import com.solevictus.adityaroshanjha.io.request.AuthRequest;
+import com.solevictus.adityaroshanjha.io.request.ResetPasswordRequest;
 import com.solevictus.adityaroshanjha.io.response.AuthReponse;
 import com.solevictus.adityaroshanjha.jwtUtil.JwtUtil;
 import com.solevictus.adityaroshanjha.service.impl.AppUserDetailsService;
 import com.solevictus.adityaroshanjha.service.intf.ProfileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,7 +58,7 @@ public class AuthController {
         }catch (DisabledException ex){
             Map<String, Object> error = new HashMap<>();
             error.put("error", true);
-            error.put("message", "Account is disbaled");
+            error.put("message", "Account is disabled");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }catch (Exception ex){
             Map<String, Object> error = new HashMap<>();
@@ -87,6 +89,21 @@ public class AuthController {
             Map<String, Object> error = new HashMap<>();
             error.put("error", true);
             error.put("message", "Something went wrong while sending OTP");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request){
+        try{
+            profileService.resetPassword(request.getEmail(), request.getOtp(), request.getNewPassword());
+            return ResponseEntity.ok(Map.of("message", "Password reset successful"));
+        }catch (ResponseStatusException ex){
+            throw ex; // Re-throw the exception to be handled by the global exception handler
+        }catch (Exception ex){
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", true);
+            error.put("message", "Something went wrong while resetting password");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }

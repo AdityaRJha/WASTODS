@@ -42,6 +42,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
 
+
         String jwtToken = null;
         String email = null;
 
