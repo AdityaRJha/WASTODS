@@ -29,9 +29,9 @@ public class UserEntity {
     @Column(unique = true)
     private String email;
     private String password;
-    private String veriyOtp;
+    private String verifyOtp;
     private Boolean isAccountVerified;
-    private Long veriyOtpExpireAt;
+    private Long verifyOtpExpireAt;
     private String resetOtp;
     private Long resetOtpExpireAt;
 

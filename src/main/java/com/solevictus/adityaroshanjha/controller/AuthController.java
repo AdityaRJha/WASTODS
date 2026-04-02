@@ -1,6 +1,7 @@
 package com.solevictus.adityaroshanjha.controller;
 
 
+import com.solevictus.adityaroshanjha.io.request.AccountVerificationRequest;
 import com.solevictus.adityaroshanjha.io.request.AuthRequest;
 import com.solevictus.adityaroshanjha.io.request.ResetPasswordRequest;
 import com.solevictus.adityaroshanjha.io.response.AuthReponse;
@@ -104,6 +105,37 @@ public class AuthController {
             Map<String, Object> error = new HashMap<>();
             error.put("error", true);
             error.put("message", "Something went wrong while resetting password");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
+    }
+
+    @PostMapping("/send-otp")
+    public void sendAccountVerificationOtp(
+            @CurrentSecurityContext(expression = "authentication?.name") String email){
+        try{
+            profileService.sendAccountVerficationOtp(email);
+        }catch (Exception ex){
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", true);
+            error.put("message", "Something went wrong while sending OTP");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
+    }
+
+    @PostMapping("/verify-account")
+    public ResponseEntity<?> verifyAccount(
+            @CurrentSecurityContext(expression = "authentication?.name") String email,
+            @RequestBody AccountVerificationRequest request
+    ) {
+        try {
+            profileService.verifyAccount(email, request.getOtp());
+            return ResponseEntity.ok(Map.of("message", "Account verification successful"));
+        } catch (ResponseStatusException ex) {
+            throw ex; // Re-throw the exception to be handled by the global exception handler
+        } catch (Exception ex) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", true);
+            error.put("message", "Something went wrong while verifying account");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }

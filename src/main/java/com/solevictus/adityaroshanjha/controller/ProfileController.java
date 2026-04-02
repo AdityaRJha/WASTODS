@@ -4,6 +4,7 @@ import com.solevictus.adityaroshanjha.io.request.ProfileRequest;
 import com.solevictus.adityaroshanjha.io.response.ProfileResponse;
 import com.solevictus.adityaroshanjha.service.impl.EmailService;
 import com.solevictus.adityaroshanjha.service.intf.ProfileService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class ProfileController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public ProfileResponse register(@Valid @RequestBody ProfileRequest request){
+    public ProfileResponse register(@Valid @RequestBody ProfileRequest request) throws MessagingException {
         ProfileResponse response = profileService.createProfile(request);
         emailService.sendWelcomeEmail(response.getEmail(), response.getName());
         return response;

@@ -5,6 +5,7 @@ import com.solevictus.adityaroshanjha.io.request.ProfileRequest;
 import com.solevictus.adityaroshanjha.io.response.ProfileResponse;
 import com.solevictus.adityaroshanjha.repository.UserRepository;
 import com.solevictus.adityaroshanjha.service.intf.ProfileService;
+import com.solevictus.adityaroshanjha.utils.enums.EmailTemplates;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -80,6 +81,63 @@ public class ProfileServiceImpl implements ProfileService {
         userRepository.save(existingEntity);
     }
 
+    @Override
+    public void sendAccountVerficationOtp(String email) {
+        UserEntity existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email : "+email));
+
+        if(existingUser.getIsAccountVerified() != null && existingUser.getIsAccountVerified()){
+            return; // Account is already verified, no need to send OTP
+        }
+
+         // Generate 6-digit OTP and set it to the user entity, then save it
+        String otp = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
+
+        existingUser.setVerifyOtp(otp);
+        existingUser.setVerifyOtpExpireAt(System.currentTimeMillis() + 24 * 60 * 60 * 1000); // OTP valid for 24 hours
+        userRepository.save(existingUser);
+
+        // Here you would also send the OTP to the user's email using your EmailService
+        try{
+            emailService.sendAccountVerificationOTP(
+                    existingUser.getEmail(),
+                    otp
+            );
+        }catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send OTP email");
+        }
+    }
+
+    @Override
+    public void verifyAccount(String email, String otp) {
+        UserEntity existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email : "+email));
+
+        if(existingUser.getVerifyOtp() == null || !existingUser.getVerifyOtp().equals(otp) || existingUser.getVerifyOtpExpireAt() < System.currentTimeMillis()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired OTP");
+        }
+
+        existingUser.setIsAccountVerified(true);
+        existingUser.setVerifyOtp(null);
+        existingUser.setVerifyOtpExpireAt(0L);
+        userRepository.save(existingUser);
+
+        // Optionally, you can also send a confirmation email to the user here using your EmailService
+        try{
+            emailService.sendVerificationSuccessEmail(existingUser.getEmail());
+        }catch (Exception ex){
+            // Log the error but don't fail the verification process
+            System.err.println("Failed to send verification success email: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    public String getLoggedInUserId(String email) {
+        UserEntity existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email : "+email));
+        return existingUser.getUserId();
+    }
+
     private ProfileResponse convertToProfileResponse(UserEntity newProfile) {
         return ProfileResponse.builder()
                 .name(newProfile.getName())
@@ -97,8 +155,8 @@ public class ProfileServiceImpl implements ProfileService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .isAccountVerified(false)
                 .resetOtpExpireAt(0L)
-                .veriyOtp(null)
-                .veriyOtpExpireAt(0L)
+                .verifyOtp(null)
+                .verifyOtpExpireAt(0L)
                 .resetOtp(null)
                 .build();
     }
