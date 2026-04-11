@@ -1,13 +1,45 @@
 import {assets} from "../assets/assets.tsx";
 import {useNavigate} from "react-router-dom";
-import {useContext, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {AppContext} from "../context/AppContext.tsx";
+import axios from "axios";
+import {toast} from "react-toastify";
 
 const Menubar = () => {
     const navigate = useNavigate();
-    const {userData} = useContext(AppContext);
+    const {userData, backendURL, setIsLoggedIn, setUserData} = useContext(AppContext);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+
+    useEffect(() => {
+        const handleClickOutside = (event: Event): void => {
+            if(dropdownRef.current && !dropdownRef.current.contains(event.target as Node)){
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleLogout = async () => {
+        try{
+            axios.defaults.withCredentials = true;
+            const response = await axios.post(backendURL + "/logout");
+            if(response.status === 200){
+                setIsLoggedIn(false);
+                setUserData(null);
+                navigate("/");
+            }
+        }catch(error){
+            if(axios.isAxiosError(error)){
+                toast.error(error.message);
+            } else {
+                toast.error("Something went wrong");
+            }
+        }
+    }
+
     return (
         <nav className="navbar bg-white px-5 py-4 d-flex justify-content-between align-items-center">
             <div className="d-flex align-items-center gap-2">
@@ -42,7 +74,10 @@ const Menubar = () => {
                                     Verify Email
                                 </div>
                             )}
-                            <div className="dropdown-item py-1 px-2 text-danger" style={{cursor: "pointer"}}>
+                            <div className="dropdown-item py-1 px-2 text-danger"
+                                 style={{cursor: "pointer"}}
+                                 onClick={handleLogout}
+                            >
                                 Logout
                             </div>
                         </div>
