@@ -8,6 +8,7 @@ import com.solevictus.adityaroshanjha.io.response.AuthReponse;
 import com.solevictus.adityaroshanjha.jwtUtil.JwtUtil;
 import com.solevictus.adityaroshanjha.service.impl.AppUserDetailsService;
 import com.solevictus.adityaroshanjha.service.intf.ProfileService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -137,6 +138,24 @@ public class AuthController {
             error.put("error", true);
             error.put("message", "Something went wrong while verifying account");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        {
+            ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                    .httpOnly(true)
+                    .secure(false) // Set to true in production with HTTPS
+                    .path("/")
+                    .maxAge(0)
+                    .sameSite("Strict")
+                    .build();
+
+            return ResponseEntity
+                    .ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(Map.of("message", "Logged out successfully"));
         }
     }
 }
