@@ -1,5 +1,5 @@
 import {assets} from "../assets/assets.tsx";
-import {useNavigate} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import {useContext, useEffect, useRef, useState} from "react";
 import {AppContext} from "../context/AppContext.tsx";
 import axios from "axios";
@@ -40,6 +40,25 @@ const Menubar = () => {
         }
     }
 
+    const sendEmailVerificationOtp = async () => {
+        try{
+            axios.defaults.withCredentials = true;
+            const response = await axios.post(backendURL + "/send-otp");
+            if(response.status === 200){
+                navigate("/email-verify");
+                toast.success("OTP has been sent to your registration email id.")
+            }else{
+                toast.error("Unable to send the OTP.")
+            }
+        }catch (error){
+            if(axios.isAxiosError(error)){
+                toast.error(error.message);
+            }else{
+                toast.error("Something went wrong");
+            }
+        }
+    }
+
     return (
         <nav className="navbar bg-white px-5 py-4 d-flex justify-content-between align-items-center">
             <div className="d-flex align-items-center gap-2">
@@ -71,7 +90,9 @@ const Menubar = () => {
                                 <div className="dropdown-item py-1 px-2"
                                      style={{cursor: "pointer"}}
                                 >
-                                    Verify Email
+                                    <span onClick={sendEmailVerificationOtp}>
+                                        Verify Email
+                                    </span>
                                 </div>
                             )}
                             <div className="dropdown-item py-1 px-2 text-danger"

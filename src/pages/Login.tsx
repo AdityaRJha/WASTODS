@@ -51,12 +51,12 @@ const Login = () => {
 
     return (
         <div className="position-relative min-vh-100 d-flex justify-content-center align-items-center"
-            style={{background : "linear-gradient(90deg, #6a5af9, #8268f9)", border: "none"}}>
+            style={{background : "linear-gradient(90deg, #2baad8, #2baaed)", border: "none"}}>
 
             <div style={{position: "absolute", top:"20px", left:"30px", display:"flex", alignItems: "center"}}>
 
                 <Link to="/" style={{textDecoration: "none"}}>
-                    <div className="card p-1 rounded-pill">
+                    <div className="card p-1 rounded-pill" style={{background: "antiquewhite"}}>
                         <div id="logoholder" style={{
                             display: "flex",
                             gap: 5,
@@ -72,7 +72,12 @@ const Login = () => {
                 </Link>
 
             </div>
-            <div className="card p-4" style={{maxWidth: "400px", width: "100%"}}>
+            <div className="card p-4"
+                 style={{
+                     maxWidth: "400px",
+                     width: "100%",
+                     background: "antiquewhite"
+            }}>
                 <h2 className="text-center mb-4">
                     {isCreateAccount ? "Create Account" : "Login"}
                 </h2>
