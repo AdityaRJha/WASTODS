@@ -13,6 +13,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const {backendURL, setIsLoggedIn, getUserData} = useContext(AppContext);
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
 
     const onSubmitHandler = async (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -72,15 +73,15 @@ const Login = () => {
                 </Link>
 
             </div>
-            <div className="card p-4"
-                 style={{
-                     maxWidth: "400px",
-                     width: "100%",
-                     background: "antiquewhite"
-            }}>
-                <h2 className="text-center mb-4">
-                    {isCreateAccount ? "Create Account" : "Login"}
-                </h2>
+                <div className="card p-4"
+                     style={{
+                         maxWidth: "400px",
+                         width: "100%",
+                         background: "antiquewhite"
+                }}>
+                    <h2 className="text-center mb-4">
+                        {isCreateAccount ? "Create Account" : "Login"}
+                    </h2>
 
                 <form onSubmit={onSubmitHandler}>
                     {
@@ -109,10 +110,10 @@ const Login = () => {
                             value={email}
                         />
                     </div>
-                    <div className="mb-3">
+                    <div className="mb-3 position-relative">
                         <label htmlFor="password" className="form-label">Password</label>
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             id="password"
                             className="form-control"
                             placeholder="************"
@@ -120,6 +121,17 @@ const Login = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             value={password}
                         />
+                        <span onClick={() => setShowPassword((prev) => !prev)}
+                              style={{
+                                  position: "absolute",
+                                  right: "10px",
+                                  top: "38px",
+                                  cursor: "pointer",
+                                  userSelect: "none",
+                                  fontSize: "20px",
+                              }}>
+                            {showPassword ? "😊" : "🫣"}
+                        </span>
                     </div>
                     <div className="d-flex justify-content-between mb-3">
                         <Link to = "/reset-password" className="text-decoration-none">

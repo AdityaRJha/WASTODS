@@ -1,10 +1,20 @@
 import {assets} from "../assets/assets.tsx";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useContext} from "react";
 import {AppContext} from "../context/AppContext.tsx";
 
 const Header = () => {
     const {userData} = useContext(AppContext);
+    const navigate = useNavigate();
+
+    const handleGetStarted = () => {
+        if(userData == null) {
+            navigate("/login")
+        }else{
+            navigate("/showcase");
+        }
+    }
+
     return(
         <div className="text-center d-flex flex-column align-items-center justify-content-center py-5 px-3" style={{minHeight : "80vh"}}>
             <Link to = "/" style={{
@@ -27,7 +37,7 @@ const Header = () => {
                 Where this is a product and a project on my resume as well. Let's start with a quick tour of this site. !
             </p>
 
-            <button className="btn btn-outline-dark rounded-pill px-4 py-2">
+            <button className="btn btn-outline-dark rounded-pill px-4 py-2" onClick={handleGetStarted}>
                 Get Started
             </button>
         </div>

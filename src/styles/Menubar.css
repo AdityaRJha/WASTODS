@@ -1,0 +1,17 @@
+.navbar {
+    /* bg-white px-5 py-4 d-flex justify-content-between align-items-center*/
+
+    //background-color: white;
+    padding: 1rem 3rem !important; /* py-4 (1rem top/bottom), px-5 (~3rem left/right) */
+    z-index: 100;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    /* Glass effect */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    color: white;
+}
