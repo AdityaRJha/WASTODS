@@ -1,7 +1,7 @@
 .navbar {
     /* bg-white px-5 py-4 d-flex justify-content-between align-items-center*/
 
-    //background-color: white;
+    background-color: #ffffff80;
     padding: 1rem 3rem !important; /* py-4 (1rem top/bottom), px-5 (~3rem left/right) */
     z-index: 100;
 
@@ -13,5 +13,5 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 
-    color: white;
+    //color: white;
 }

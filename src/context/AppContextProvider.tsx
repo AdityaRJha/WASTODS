@@ -10,7 +10,7 @@ type Props = {
 };
 
 export const AppContextProvider = ({ children }: Props): ReactNode => {
-    const backendURL = AppConstants.BACKKEND_URL;
+    const backendURL = AppConstants.BACKEND_URL;
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userData, setUserData] = useState<User | null>(null);
 
