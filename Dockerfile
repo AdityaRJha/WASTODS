@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Copy only package.json and package-lock.json first
 # This helps Docker cache dependencies (faster rebuilds)
-COPY package*.json ./
+COPY package*.json .
 
 # Install dependencies
 # Runs only when package.json changes (thanks to caching above)
@@ -19,9 +19,12 @@ RUN npm install
 COPY . .
 
 # Expose port 3000 (React dev server runs here)
-EXPOSE 3000
+EXPOSE 5173
+
+# ENV HOST=0.0.0.0
 
 # Start React app in development mode
 # This runs "npm start" → react-scripts start
 # Hot reload enabled (good for dev, not production)
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
+#CMD ["npm", "run", "dev", "--", "--host"]

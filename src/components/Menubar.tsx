@@ -67,6 +67,9 @@ const Menubar = () => {
                 <span className="fw-bold fs-4 text-dark">teApot</span>
             </div>
 
+            <div className="btn btn-outline-dark rounded-pill px-3" onClick={() => navigate("/showcase")}>
+                Products <i className="bi bi-arrow-right ms-2"></i>
+            </div>
             {userData ? (
                 <div className="position-relative" ref={dropdownRef}>
                     <div className="bg-dark text-white rounded-circle d-flex justify-content-center align-items-center"
